@@ -39,31 +39,21 @@ func CombineResults(in, out chan interface{}) {
 
 func main() {
 
-	// jobs := []job{
-	// 	job(func(in, out chan interface{}) {
-	// 		out <- 1
-	// 		time.Sleep(5 * time.Second)
-	// 		fmt.Println("Job put 1 is done")
-	// 	}),
-	// 	job(func(in, out chan interface{}) {
-	// 		fmt.Println("Job printer start")
-	// 		for val := range in {
-	// 			fmt.Println("Printed value: ", val)
-	// 		}
-	// 	}),
-	// }
-
-	// ExecutePipeline(jobs...)
-
-	ch := make(chan int)
-	go test(ch)
-	for i := 0; i < 5; i++ {
-		ch <- i
+	jobs := []job{
+		job(func(in, out chan interface{}) {
+			out <- 1
+			time.Sleep(5 * time.Second)
+			fmt.Println("Job put 1 is done")
+		}),
+		job(func(in, out chan interface{}) {
+			fmt.Println("Job printer start")
+			for val := range in {
+				fmt.Println("Printed value: ", val)
+			}
+		}),
 	}
-	// ch2 := make(chan int)
-	// ch = ch2
-	// go test(ch2)
-	// ch2 <- 1
+
+	ExecutePipeline(jobs...)
 
 }
 
