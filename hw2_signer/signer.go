@@ -15,8 +15,7 @@ func worker(wg *sync.WaitGroup, j job, in, out chan interface{}) {
 // ExecutePipeline -  выполняет задачи в конвеерном режиме. По аналогии с pipeline в unix
 func ExecutePipeline(jobs ...job) {
 	wg := &sync.WaitGroup{}
-	ch1 := make(chan interface{})
-
+	var ch1 chan interface{}
 	for _, j := range jobs {
 		ch2 := make(chan interface{})
 		wg.Add(1)
