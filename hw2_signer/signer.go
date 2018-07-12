@@ -2,8 +2,9 @@ package main
 
 import (
 	"fmt"
+	"strconv"
+	"strings"
 	"sync"
-	"time"
 )
 
 func worker(wg *sync.WaitGroup, j job, in, out chan interface{}) {
@@ -26,33 +27,80 @@ func ExecutePipeline(jobs ...job) {
 }
 
 func SingleHash(in, out chan interface{}) {
-
+	for chVal := range in {
+		var strVal string
+		switch val := chVal.(type) {
+		case int:
+			strVal = strconv.Itoa(val)
+		case string:
+			strVal = val
+		}
+		res := DataSignerCrc32(strVal) + "~" + DataSignerCrc32(DataSignerMd5(strVal))
+		fmt.Println("SingleHash data:", strVal)
+		fmt.Println("SingleHash Result: ", res)
+		out <- res
+	}
 }
 
 func MultiHash(in, out chan interface{}) {
+	for chVal := range in {
+		val, ok := chVal.(string)
+		var res string
+		if !ok {
+			panic("Can' not use val as not string")
+		}
 
+		for i := 0; i < 6; i++ {
+			strI := strconv.Itoa(i)
+			res += DataSignerCrc32(strI + val)
+		}
+		fmt.Println("MultiHash data: ", chVal)
+		fmt.Println("MultiHash Result: ", res)
+		out <- res
+	}
 }
 
 func CombineResults(in, out chan interface{}) {
+	var res string
+	for chVal := range in {
+		val, ok := chVal.(string)
+		if !ok {
+			panic("Can' not use val as not string")
+		}
+		res += val
+		res += "_"
+	}
 
+	if strings.HasSuffix(res, "_") {
+		out <- strings.TrimSuffix(res, "_")
+	} else {
+		out <- res
+	}
 }
 
 func main() {
 
-	jobs := []job{
+	inputData := []int{0, 1}
+
+	hashSignJobs := []job{
 		job(func(in, out chan interface{}) {
-			out <- 1
-			time.Sleep(5 * time.Second)
-			fmt.Println("Job put 1 is done")
-		}),
-		job(func(in, out chan interface{}) {
-			fmt.Println("Job printer start")
-			for val := range in {
-				fmt.Println("Printed value: ", val)
+			for _, fibNum := range inputData {
+				out <- fibNum
 			}
+		}),
+		job(SingleHash),
+		job(MultiHash),
+		job(CombineResults),
+		job(func(in, out chan interface{}) {
+			dataRaw := <-in
+			data, ok := dataRaw.(string)
+			if !ok {
+				fmt.Println("Can't convert to string")
+			}
+			fmt.Println(data)
 		}),
 	}
 
-	ExecutePipeline(jobs...)
+	ExecutePipeline(hashSignJobs...)
 
 }
