@@ -56,10 +56,3 @@ func main() {
 	ExecutePipeline(jobs...)
 
 }
-
-func test(ch chan int) {
-	time.Sleep(time.Second)
-	for val := range ch {
-		fmt.Println(val)
-	}
-}
