@@ -49,7 +49,7 @@ var (
 )
 
 // TODO: Добавить проверку на ошибки при выводе
-var logger func(string)
+var logger func(string) error
 
 func dirTree(out io.Writer, path string, printFiles bool) (resError error) {
 	f, err := os.Open(path)
@@ -74,6 +74,7 @@ func dirTree(out io.Writer, path string, printFiles bool) (resError error) {
 		return fmt.Errorf("Can't open file as dir: %s", fStat.Name())
 	}
 
+	// Компаратор для сравнения по ключу = name
 	fileNameKey := func(p1, p2 *os.FileInfo) bool {
 		return (*p1).Name() < (*p2).Name()
 	}
@@ -84,11 +85,17 @@ func dirTree(out io.Writer, path string, printFiles bool) (resError error) {
 
 func printDirTree(out io.Writer, path, mainPrefix string, comparator func(p1, p2 *os.FileInfo) bool,
 	printFiles bool) (resError error) {
-	// logger(path)
 	f, err := os.Open(path)
 	if err != nil {
 		return err
 	}
+
+	defer func() {
+		err := f.Close()
+		if resError == nil {
+			resError = err
+		}
+	}()
 
 	fStat, err := f.Stat()
 	if err != nil {
@@ -108,7 +115,7 @@ func printDirTree(out io.Writer, path, mainPrefix string, comparator func(p1, p2
 		By(comparator).Sort(subFiles)
 
 		if !printFiles {
-			// TODO: вынести в отдельную функцию
+			// Удаляем файлы из списка
 			tmp := make([]os.FileInfo, 0, len(subFiles))
 			for _, fInfo := range subFiles {
 				if fInfo.IsDir() {
@@ -125,7 +132,6 @@ func printDirTree(out io.Writer, path, mainPrefix string, comparator func(p1, p2
 			var graphicsPrefix = rightFullGraphics
 			var paddingPrefix = Vertical + "\t"
 
-			// TODO: Неправильное отображение, если исключаем файлы
 			if idx == len(subFiles)-1 {
 				graphicsPrefix = rightHalfGraphics
 				paddingPrefix = "\t"
@@ -179,7 +185,6 @@ func printWithPrefix(out io.Writer, name, prefix string) error {
 }
 
 func main() {
-
 	out := os.Stdout
 	if !(len(os.Args) == 2 || len(os.Args) == 3) {
 		panic("usage go run main.go . [-f]")
@@ -194,9 +199,15 @@ func main() {
 
 func init() {
 	buildGraphicsElement(4)
-	var prefixer = func(prefix string) func(string) {
-		return func(str string) {
-			fmt.Printf("[%s]: %s\n", prefix, str)
+
+	var prefixer = func(prefix string) func(string) error {
+		return func(str string) error {
+			if n, err := fmt.Printf("[%s]: %s\n", prefix, str); err != nil {
+				return err
+			} else if n != len("[]: \n")+len(prefix)+len(str) {
+				return fmt.Errorf("Ivalid write \"[%s]: %s\"", prefix, str)
+			}
+			return nil
 		}
 	}
 
