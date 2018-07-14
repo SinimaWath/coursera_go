@@ -49,11 +49,7 @@ var (
 )
 
 // TODO: Добавить проверку на ошибки при выводе
-<<<<<<< HEAD
-var logger func(string)
-=======
 var logger func(string) error
->>>>>>> 08627ac73b43af52a58d4a2981484b0b6cc5e183
 
 func dirTree(out io.Writer, path string, printFiles bool) (resError error) {
 	f, err := os.Open(path)
@@ -78,10 +74,7 @@ func dirTree(out io.Writer, path string, printFiles bool) (resError error) {
 		return fmt.Errorf("Can't open file as dir: %s", fStat.Name())
 	}
 
-<<<<<<< HEAD
-=======
 	// Компаратор для сравнения по ключу = name
->>>>>>> 08627ac73b43af52a58d4a2981484b0b6cc5e183
 	fileNameKey := func(p1, p2 *os.FileInfo) bool {
 		return (*p1).Name() < (*p2).Name()
 	}
@@ -92,18 +85,11 @@ func dirTree(out io.Writer, path string, printFiles bool) (resError error) {
 
 func printDirTree(out io.Writer, path, mainPrefix string, comparator func(p1, p2 *os.FileInfo) bool,
 	printFiles bool) (resError error) {
-<<<<<<< HEAD
-	// logger(path)
-=======
-
->>>>>>> 08627ac73b43af52a58d4a2981484b0b6cc5e183
 	f, err := os.Open(path)
 	if err != nil {
 		return err
 	}
 
-<<<<<<< HEAD
-=======
 	defer func() {
 		err := f.Close()
 		if resError == nil {
@@ -111,7 +97,6 @@ func printDirTree(out io.Writer, path, mainPrefix string, comparator func(p1, p2
 		}
 	}()
 
->>>>>>> 08627ac73b43af52a58d4a2981484b0b6cc5e183
 	fStat, err := f.Stat()
 	if err != nil {
 		return err
@@ -130,11 +115,7 @@ func printDirTree(out io.Writer, path, mainPrefix string, comparator func(p1, p2
 		By(comparator).Sort(subFiles)
 
 		if !printFiles {
-<<<<<<< HEAD
-			// TODO: вынести в отдельную функцию
-=======
 			// Удаляем файлы из списка
->>>>>>> 08627ac73b43af52a58d4a2981484b0b6cc5e183
 			tmp := make([]os.FileInfo, 0, len(subFiles))
 			for _, fInfo := range subFiles {
 				if fInfo.IsDir() {
@@ -151,10 +132,6 @@ func printDirTree(out io.Writer, path, mainPrefix string, comparator func(p1, p2
 			var graphicsPrefix = rightFullGraphics
 			var paddingPrefix = Vertical + "\t"
 
-<<<<<<< HEAD
-			// TODO: Неправильное отображение, если исключаем файлы
-=======
->>>>>>> 08627ac73b43af52a58d4a2981484b0b6cc5e183
 			if idx == len(subFiles)-1 {
 				graphicsPrefix = rightHalfGraphics
 				paddingPrefix = "\t"
