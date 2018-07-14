@@ -42,26 +42,28 @@ func SingleHash(in, out chan interface{}) {
 				strVal = strconv.Itoa(val)
 			case string:
 				strVal = val
+			default:
+				fmt.Printf("Such type doesn't support %T\n", val)
+				return
 			}
 
-			ch1 := make(chan string, 1)
-			ch2 := make(chan string, 1)
+			chSlice := []chan string{
+				make(chan string, 1),
+				make(chan string, 1),
+			}
+
 			worker := func(strVal string, out chan<- string) {
 				out <- DataSignerCrc32(strVal)
 			}
-
-			go worker(strVal, ch1)
+			go worker(strVal, chSlice[0])
 
 			mutex.Lock()
 			md5Val := DataSignerMd5(strVal)
 			mutex.Unlock()
+			go worker(md5Val, chSlice[1])
 
-			go worker(md5Val, ch2)
-
-			first := <-ch1
-			fmt.Println("SH first: ", first)
-			second := <-ch2
-			fmt.Println("Sh second: ", second)
+			first := <-chSlice[0]
+			second := <-chSlice[1]
 
 			out <- (first + "~" + second)
 		}(chVal, wg)
@@ -76,11 +78,10 @@ func MultiHash(in, out chan interface{}) {
 		go func(wg *sync.WaitGroup, chVal interface{}) {
 			defer wg.Done()
 			val, ok := chVal.(string)
-			var res string
 			if !ok {
 				panic("Can't use val as not string")
 			}
-
+			var res string
 			chSlice := make([]chan string, 6, 6)
 			for i := 0; i < 6; i++ {
 				chSlice[i] = make(chan string, 1)
@@ -93,8 +94,6 @@ func MultiHash(in, out chan interface{}) {
 			for _, val := range chSlice {
 				res += <-val
 			}
-			fmt.Println("MultiHash data: ", chVal)
-			fmt.Println("MultiHash Result: ", res)
 			out <- res
 		}(wg, chVal)
 	}
