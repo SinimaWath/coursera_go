@@ -28,12 +28,8 @@ var (
 
 type User struct {
 	Browsers []string
-	Company  string
-	Country  string
 	Email    string
-	Job      string
 	Name     string
-	Phone    string
 }
 
 func easyjson9e1087fdDecodeGithubComSinimaWathCourseraHwHw3BenchObject(in *jlexer.Lexer, out *User) {
@@ -78,18 +74,10 @@ func easyjson9e1087fdDecodeGithubComSinimaWathCourseraHwHw3BenchObject(in *jlexe
 				}
 				in.Delim(']')
 			}
-		case "company":
-			out.Company = string(in.String())
-		case "country":
-			out.Country = string(in.String())
 		case "email":
 			out.Email = string(in.String())
-		case "job":
-			out.Job = string(in.String())
 		case "name":
 			out.Name = string(in.String())
-		case "phone":
-			out.Phone = string(in.String())
 		default:
 			in.SkipRecursive()
 		}
@@ -126,26 +114,6 @@ func easyjson9e1087fdEncodeGithubComSinimaWathCourseraHwHw3BenchObject(out *jwri
 		}
 	}
 	{
-		const prefix string = ",\"company\":"
-		if first {
-			first = false
-			out.RawString(prefix[1:])
-		} else {
-			out.RawString(prefix)
-		}
-		out.String(string(in.Company))
-	}
-	{
-		const prefix string = ",\"country\":"
-		if first {
-			first = false
-			out.RawString(prefix[1:])
-		} else {
-			out.RawString(prefix)
-		}
-		out.String(string(in.Country))
-	}
-	{
 		const prefix string = ",\"email\":"
 		if first {
 			first = false
@@ -156,16 +124,6 @@ func easyjson9e1087fdEncodeGithubComSinimaWathCourseraHwHw3BenchObject(out *jwri
 		out.String(string(in.Email))
 	}
 	{
-		const prefix string = ",\"job\":"
-		if first {
-			first = false
-			out.RawString(prefix[1:])
-		} else {
-			out.RawString(prefix)
-		}
-		out.String(string(in.Job))
-	}
-	{
 		const prefix string = ",\"name\":"
 		if first {
 			first = false
@@ -174,16 +132,6 @@ func easyjson9e1087fdEncodeGithubComSinimaWathCourseraHwHw3BenchObject(out *jwri
 			out.RawString(prefix)
 		}
 		out.String(string(in.Name))
-	}
-	{
-		const prefix string = ",\"phone\":"
-		if first {
-			first = false
-			out.RawString(prefix[1:])
-		} else {
-			out.RawString(prefix)
-		}
-		out.String(string(in.Phone))
 	}
 	out.RawByte('}')
 }
