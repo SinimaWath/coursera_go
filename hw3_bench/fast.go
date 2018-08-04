@@ -2,10 +2,8 @@ package main
 
 import (
 	"bufio"
-	"bytes"
 	"fmt"
 	"io"
-	"log"
 	"os"
 	"strings"
 )
@@ -187,13 +185,7 @@ func FastSearch(out io.Writer) {
 
 	for i := 0; scanner.Scan(); i++ {
 
-		userString := scanner.Text()
-
-		if err := scanner.Err(); err != nil {
-			panic(err)
-		}
-
-		if err := user.UnmarshalJSON([]byte(userString)); err != nil {
+		if err := user.UnmarshalJSON(scanner.Bytes()); err != nil {
 			panic(err)
 		}
 
@@ -222,13 +214,14 @@ func FastSearch(out io.Writer) {
 
 		fmt.Fprintf(out, "[%d] %s <%s>\n", i, user.Name, strings.Replace(user.Email, "@", " [at] ", 1))
 	}
+
+	if err := scanner.Err(); err != nil {
+		panic(err)
+	}
+
 	fmt.Fprintf(out, "\n")
 	fmt.Fprintln(out, "Total unique browsers", len(seenBrowsers))
 }
 
 func main() {
-	buf := bytes.Buffer{}
-	FastSearch(&buf)
-	str := string(buf.Bytes())
-	log.Println(str)
 }
