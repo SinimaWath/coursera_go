@@ -228,11 +228,15 @@ func FastSearch(out io.Writer) {
 
 	defer file.Close()
 
-	seenBrowsers := make(map[string]bool)
-	var foundUsers string
+	seenBrowsers := make(map[string]struct{})
 	user := &User{}
 
+	isAndroid := false
+	isMSIE := false
+
 	scanner := bufio.NewScanner(file)
+	fmt.Fprintln(out, "found users:")
+
 	for i := 0; scanner.Scan(); i++ {
 
 		userString := scanner.Text()
@@ -245,22 +249,21 @@ func FastSearch(out io.Writer) {
 			panic(err)
 		}
 
-		isAndroid := false
-		isMSIE := false
+		isAndroid = false
+		isMSIE = false
 
 		for _, browser := range user.Browsers {
 
 			if strings.Contains(browser, androidBrowserRegex) {
 				isAndroid = true
-				if val := seenBrowsers[browser]; !val {
-					seenBrowsers[browser] = true
-					// log.Println("[FAST] find new browser: ", browser)
+				if _, ok := seenBrowsers[browser]; !ok {
+					seenBrowsers[browser] = struct{}{}
+
 				}
 			} else if strings.Contains(browser, msieBrowserRegex) {
 				isMSIE = true
-				if val := seenBrowsers[browser]; !val {
-					seenBrowsers[browser] = true
-					// log.Println("[FAST] find new browser: ", browser)
+				if _, ok := seenBrowsers[browser]; !ok {
+					seenBrowsers[browser] = struct{}{}
 				}
 			}
 		}
@@ -269,10 +272,9 @@ func FastSearch(out io.Writer) {
 			continue
 		}
 
-		foundUsers += fmt.Sprintf("[%d] %s <%s>\n", i, user.Name, strings.Replace(user.Email, "@", " [at] ", 1))
+		fmt.Fprintf(out, "[%d] %s <%s>\n", i, user.Name, strings.Replace(user.Email, "@", " [at] ", 1))
 	}
-
-	fmt.Fprintln(out, "found users:\n"+foundUsers)
+	fmt.Fprintf(out, "\n")
 	fmt.Fprintln(out, "Total unique browsers", len(seenBrowsers))
 }
 
