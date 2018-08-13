@@ -21,7 +21,6 @@ const (
 	accessToken = "kek"
 
 	ErrorBadQuery       = "ErrorBadQuery"
-	ErrorBadOrderField  = "ErrorBadOrderField"
 	ErrorBadAccessToken = "Bad AccessToken"
 )
 
@@ -68,7 +67,7 @@ func SearchServer(w http.ResponseWriter, r *http.Request) {
 	searchRequest.OrderField = r.FormValue("order_field")
 	if _, exist := orderFieldAvailable[searchRequest.OrderField]; !exist {
 		w.WriteHeader(http.StatusBadRequest)
-		data, jsonErr := json.Marshal(&SearchErrorResponse{Error: ErrorBadOrderField})
+		data, jsonErr := json.Marshal(&SearchErrorResponse{Error: "ErrorBadOrderField"})
 		if jsonErr != nil {
 			log.Printf("Marshal error: %#v", jsonErr)
 		}
@@ -123,7 +122,7 @@ type RowXML struct {
 
 func RowXMLToUser(row *RowXML) *User {
 	return &User{
-		ID:     row.ID,
+		Id:     row.ID,
 		Name:   row.FirstName + " " + row.SecondName,
 		Age:    row.Age,
 		About:  row.About,
@@ -213,7 +212,7 @@ func TestFindUserBadOrderField(t *testing.T) {
 		sReq: &SearchRequest{
 			OrderField: "Incorrect",
 		},
-		err: "OrderField Incorrect invalid",
+		err: "OrderFeld Incorrect invalid",
 	}
 
 	ts := httptest.NewServer(http.HandlerFunc(SearchServer))
@@ -447,15 +446,15 @@ func initTestCases(url string) []TestCase {
 				Offset:     0,
 				OrderBy:    0,
 				OrderField: "",
-				Query:      "test test",
+				Query:      "Boyd Wolf",
 			},
 			sResp: &SearchResponse{
 				Users: []User{
 					User{
-						ID:     0,
-						Name:   "test test",
+						Id:     0,
+						Name:   "Boyd Wolf",
 						Age:    22,
-						About:  "test",
+						About:  "Nulla cillum enim voluptate consequat laborum esse excepteur occaecat commodo nostrud excepteur ut cupidatat. Occaecat minim incididunt ut proident ad sint nostrud ad laborum sint pariatur. Ut nulla commodo dolore officia. Consequat anim eiusmod amet commodo eiusmod deserunt culpa. Ea sit dolore nostrud cillum proident nisi mollit est Lorem pariatur. Lorem aute officia deserunt dolor nisi aliqua consequat nulla nostrud ipsum irure id deserunt dolore. Minim reprehenderit nulla exercitation labore ipsum.\n",
 						Gender: "male",
 					},
 				},
@@ -472,36 +471,15 @@ func initTestCases(url string) []TestCase {
 				Offset:     0,
 				OrderBy:    0,
 				OrderField: "",
-				Query:      "test",
+				Query:      "Boyd Wolf",
 			},
 			sResp: &SearchResponse{
 				Users: []User{
 					User{
-						ID:     0,
-						Name:   "test test",
+						Id:     0,
+						Name:   "Boyd Wolf",
 						Age:    22,
-						About:  "test",
-						Gender: "male",
-					},
-					User{
-						ID:     1,
-						Name:   "Hilda Mayer",
-						Age:    21,
-						About:  "test",
-						Gender: "female",
-					},
-					User{
-						ID:     2,
-						Name:   "Brooks Aguilar",
-						Age:    25,
-						About:  "test",
-						Gender: "male",
-					},
-					User{
-						ID:     10,
-						Name:   "Henderson Maxwell",
-						Age:    30,
-						About:  "test",
+						About:  "Nulla cillum enim voluptate consequat laborum esse excepteur occaecat commodo nostrud excepteur ut cupidatat. Occaecat minim incididunt ut proident ad sint nostrud ad laborum sint pariatur. Ut nulla commodo dolore officia. Consequat anim eiusmod amet commodo eiusmod deserunt culpa. Ea sit dolore nostrud cillum proident nisi mollit est Lorem pariatur. Lorem aute officia deserunt dolor nisi aliqua consequat nulla nostrud ipsum irure id deserunt dolore. Minim reprehenderit nulla exercitation labore ipsum.\n",
 						Gender: "male",
 					},
 				},
@@ -517,15 +495,15 @@ func initTestCases(url string) []TestCase {
 				Offset:     0,
 				OrderBy:    0,
 				OrderField: "",
-				Query:      "test",
+				Query:      "",
 			},
 			sResp: &SearchResponse{
 				Users: []User{
 					User{
-						ID:     0,
-						Name:   "test test",
+						Id:     0,
+						Name:   "Boyd Wolf",
 						Age:    22,
-						About:  "test",
+						About:  "Nulla cillum enim voluptate consequat laborum esse excepteur occaecat commodo nostrud excepteur ut cupidatat. Occaecat minim incididunt ut proident ad sint nostrud ad laborum sint pariatur. Ut nulla commodo dolore officia. Consequat anim eiusmod amet commodo eiusmod deserunt culpa. Ea sit dolore nostrud cillum proident nisi mollit est Lorem pariatur. Lorem aute officia deserunt dolor nisi aliqua consequat nulla nostrud ipsum irure id deserunt dolore. Minim reprehenderit nulla exercitation labore ipsum.\n",
 						Gender: "male",
 					},
 				},
